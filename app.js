@@ -1,23 +1,17 @@
 import { Hono } from "https://deno.land/x/hono@v3.12.11/mod.ts";
+import * as visits from "./visits.js"
 
 const app = new Hono();
 
-app.get("/", (c) => c.text("Hi there!"));
 
-app.get("/congrats", (c) => c.text(`Congrats, ${c.req.query("heroOfTheDay")}!`));
+app.get("/", async (c) => {
+		await visits.setVisits();
+		return c.text("Hello world!")
+	});
 
-app.on(
-  "DIDNOT",
-  "/lol",
-  (c) => c.text(`What kind of tree fits in your hand? A palm tree.`),
-);
-
-app.get("/items/:id", (c) =>
-	c.text(`Retrieving item ${c.req.param("id")}.`)
-	);
-
-app.all("*", (c) => {
-  return c.text("Not here.");
-});
+app.get("/visits", async (c) => {
+		const visitsCount = await visits.getVisits();
+	 return c.text(`Visit count: ${visitsCount}`)
+	 });
 
 export default app;
