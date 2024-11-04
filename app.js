@@ -1,17 +1,19 @@
 import { Hono } from "https://deno.land/x/hono@v3.12.11/mod.ts";
-import * as visits from "./visits.js"
+import * as feedback from "./feedbacks.js"
 
 const app = new Hono();
 
 
-app.get("/", async (c) => {
-		await visits.setVisits();
-		return c.text("Hello world!")
-	});
+app.get("/feedbacks/:value", async (c) => {
+    const value = Number(c.req.param("value"));
+    const count = await feedback.getFeedbackCount(value);
+    return c.text(`Feedback ${value}: ${count}`);
+  });
 
-app.get("/visits", async (c) => {
-		const visitsCount = await visits.getVisits();
-	 return c.text(`Visit count: ${visitsCount}`)
-	 });
+app.post("/feedbacks/:value", async (c) => {
+  const value = Number(c.req.param("value"));
+  await feedback.setFeedback(value);
+  return c.text(`Feedback ${value} added.`)
+   });
 
 export default app;
